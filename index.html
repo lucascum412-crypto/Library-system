@@ -11,8 +11,6 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
         const firebaseConfig = {
             apiKey: "AIzaSyAhNkPdYg2hCqiqdnoASLfSf98YktHem0U",
             authDomain: "gen-lang-client-0524752945.firebaseapp.com",
@@ -21,30 +19,7 @@
             messagingSenderId: "281147232521",
             appId: "1:281147232521:web:81a98c4c4b9ad88b9ec3d8"
         };
-
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        window.auth = auth;
-        window.provider = provider;
-        window.signInWithPopup = signInWithPopup;
-        window.signOut = signOut;
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                localStorage.setItem('library_user', JSON.stringify({
-                    name: user.displayName || "Google User",
-                    id: user.uid.substring(0, 8).toUpperCase(),
-                    grade: "S1",
-                    class: "A",
-                    avatar: user.photoURL || ""
-                }));
-                checkAuth();
-            } else {
-                checkAuth();
-            }
-        });
     </script>
     <style>
         :root {
@@ -98,7 +73,7 @@
                 </button>
             </div>
             <div class="space-y-4 font-serif-italic opacity-80 text-lg leading-relaxed">
-                <p>1. 登錄您的帳戶以同步本地與雲端的借閱資料。</p>
+                <p>1. 首次進入系統請完整填寫個人資訊登記。</p>
                 <p>2. 在「借書登記」頁面可以點擊左側快速引入推薦書籍，或點擊按鈕手動輸入新登記。</p>
                 <p>3. 點擊右上角頭像可以進入個人檔案修改欄位（如 GAS 端點 URL）。</p>
                 <p>4. 在「還書管理」分頁中，您可以隨時對名下未歸還的書籍辦理退還手續。</p>
@@ -193,8 +168,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div id="ai-report-content" class="flex-1 overflow-y-auto space-y-4 font-serif-italic opacity-90 text-md leading-relaxed pr-2">
-                </div>
+            <div id="ai-report-content" class="flex-1 overflow-y-auto space-y-4 font-serif-italic opacity-90 text-md leading-relaxed pr-2"></div>
             <button onclick="closeModal('modal-ai-report')" class="w-full bg-[#141414] text-[#E4E3E0] py-4 text-xs font-bold uppercase tracking-widest shrink-0 mt-4">關閉報告</button>
         </div>
     </div>
@@ -206,16 +180,30 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-20"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/><path d="M12 2h10"/><path d="m16 2-4 4 4 4"/></svg>
                 </div>
                 <h2 class="text-2xl font-bold uppercase tracking-widest">圖書館系統登錄</h2>
-                <p class="font-serif-italic opacity-60 text-sm">請輸入個人資料或授權進入系統</p>
+                <p class="font-serif-italic opacity-60 text-sm">請填寫您的資訊以初始化系統帳戶</p>
             </div>
             
-            <div class="space-y-4">
-                <button onclick="handleGoogleLogin()" class="w-full border border-[#141414] py-3 flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-all">
-                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    <span>使用 Google 帳號登入</span>
-                </button>
-                <div class="flex items-center gap-4">
-                    <div class="h-[1px] flex-1 bg-[#141414] opacity-10"></div>
-                    <span class="text-[10px] font-mono uppercase opacity-30 text-nowrap">或者填寫本地資料</span>
-                    <div class="h-[1px] flex-1 bg-[#141414] opacity-10"></div>
-                </div>
+            <form onsubmit="handleCustomLogin(event)" class="space-y-6">
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-mono uppercase opacity-50">姓名</label>
+                        <input type="text" id="login-name" class="form-input text-lg" placeholder="請輸入真實姓名" required>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-mono uppercase opacity-50">學號 / 編號</label>
+                        <input type="text" id="login-id" class="form-input text-lg" placeholder="SXXXXX" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-mono uppercase opacity-50">年級</label>
+                            <select id="login-grade" class="form-input text-sm h-[40px] bg-transparent" onchange="updateClassOptions('login')" required>
+                                <option value="" disabled selected>請選擇</option>
+                                <optgroup label="Primary (P)">
+                                    <option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option>
+                                    <option value="P4">P4</option><option value="P5">P5</option><option value="P6">P6</option>
+                                </optgroup>
+                                <optgroup label="Secondary (S)">
+                                    <option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+                                    <option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
+                                </optgroup>
+                            </select>
