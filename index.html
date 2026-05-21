@@ -34,11 +34,9 @@
         // Listen for auth state
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // If logged in via Google but not fully "registered" in our local sense
-                // we still allow checkAuth to handle the local storage part
                 await checkAuth();
             } else {
-                await checkAuth(); // This will show login if no local user either
+                await checkAuth(); 
             }
         });
     </script>
@@ -160,7 +158,7 @@
                         <div class="space-y-1">
                             <label class="text-[10px] font-mono uppercase opacity-50" data-t="classLabel">班別</label>
                             <select id="profile-class" class="form-input text-sm h-[40px] bg-transparent" required>
-                                </select>
+                            </select>
                         </div>
                     </div>
                     <div class="space-y-1">
@@ -509,9 +507,13 @@
                 </section>
 
                 <section class="lg:col-span-8 lg:border-l lg:border-[#141414] lg:pl-8">
-                    <div class="flex items-center justify-between mb-6 text-xl">
-                        <h2 class="font-serif-italic opacity-70" data-t="currentBorrowList">當前借出清單</h2>
-                        <div id="active-badge" class="text-[10px] font-mono border border-[#141414] text-[#141414] px-2 py-1">ACTIVE: 0</div>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-6">
+                        <h2 class="font-serif-italic text-xl opacity-70" data-t="currentBorrowList">當前借出清單</h2>
+                        <!-- New Feature Integration: Search bar carefully aligned to keep UI styling -->
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <input type="text" id="searchKeyword" oninput="handleSearchFilter()" class="bg-transparent border-b border-[#141414] text-xs font-mono px-2 py-1 outline-none w-full sm:w-48 text-left sm:text-right" placeholder="搜尋書名或借閱者...">
+                            <div id="active-badge" class="text-[10px] font-mono border border-[#141414] text-[#141414] px-2 py-1 text-nowrap">ACTIVE: 0</div>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -525,7 +527,7 @@
                                 </tr>
                             </thead>
                             <tbody id="borrow-table-body">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </section>
@@ -540,7 +542,7 @@
                         </div>
                     </div>
                     <div id="return-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        </div>
+                    </div>
                 </section>
                 
                 <section>
@@ -557,7 +559,7 @@
                                 </tr>
                             </thead>
                             <tbody id="history-table-body">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </section>
@@ -589,7 +591,9 @@
                 bookTitle: record.bookTitle || record.BookTitle || "未知名稱",
                 borrowDate: record.borrowDate || record.BorrowDate || "",
                 returnDate: record.returnDate || record.ReturnDate || "",
-                returnedAt: record.returnedAt || record.ReturnedAt || ""
+                returnedAt: record.returnedAt || record.ReturnedAt || "",
+                grade: record.grade || record.Grade || "",
+                classLetter: record.classLetter || record.ClassLetter || ""
             };
         }
 
@@ -672,7 +676,9 @@
                 noHistory: "暫無歷史記錄",
                 myBorrowOnly: "您目前沒有待歸還的書籍",
                 autoFill: "自動填寫資料",
-                exportData: "匯出用戶檔案 (JSON)"
+                exportData: "匯出用戶檔案 (JSON)",
+                searchPlaceholder: "搜尋書名或借閱者...",
+                overdue: "已逾期"
             },
             'en': {
                 loginTitle: "Library System Login",
@@ -729,7 +735,9 @@
                 noHistory: "No history found",
                 myBorrowOnly: "You have no active rentals",
                 autoFill: "Auto-fill Data",
-                exportData: "Export Profile Record (JSON)"
+                exportData: "Export Profile Record (JSON)",
+                searchPlaceholder: "Search book or borrower...",
+                overdue: "Overdue"
             }
         };
 
@@ -748,22 +756,19 @@
                 const key = el.getAttribute('data-t');
                 if (t[key]) el.innerText = t[key];
             });
-            // Update placeholders and dynamic labels
             document.getElementById("form-title").innerText = isFormVisible ? t.registerBorrowing : t.recTitle;
             document.getElementById("toggle-text").innerText = isFormVisible ? t.close : t.registerBorrowing;
             document.getElementById("bookTitle").placeholder = currentLang === 'en' ? "Enter book title..." : "請輸入書名...";
+            document.getElementById("searchKeyword").placeholder = t.searchPlaceholder;
             
-            // Update tabs
             document.getElementById("tab-borrow").innerText = t.borrowTab;
             document.getElementById("tab-return").innerText = t.returnTab;
             
-            // Re-render lists to update dynamic content
             await renderList();
         }
 
         function openModal(id) {
             if (id === 'modal-profile') {
-                // Pre-fill profile fields
                 document.getElementById("profile-name").value = currentUser.name;
                 document.getElementById("profile-id").value = currentUser.id;
                 document.getElementById("profile-grade").value = currentUser.grade;
@@ -841,9 +846,8 @@
                 const result = await window.signInWithPopup(window.auth, window.provider);
                 const user = result.user;
                 
-                // Pre-fill the form with Google data
                 document.getElementById("login-name").value = user.displayName || "";
-                document.getElementById("login-id").value = user.uid.substring(0, 8); // Simplified ID
+                document.getElementById("login-id").value = user.uid.substring(0, 8); 
                 document.getElementById("login-avatar").value = user.photoURL || "";
                 
                 alert(t.loginSuccess.replace("${user.displayName}", user.displayName));
@@ -910,7 +914,6 @@
                 currentUser = null;
                 closeModal('modal-profile');
                 
-                // Final reset: reload the page to clear any in-memory state
                 alert(currentLang === 'en' ? "Logged out successfully." : "已成功登出。");
                 location.reload();
             }
@@ -919,10 +922,8 @@
         function updateUserUI() {
             if (!currentUser) return;
             
-            // Header Info
             const nameDisplay = document.getElementById("user-display-name");
             if (nameDisplay) {
-                nameDisplay.innerText = currentUser.name;
                 const container = nameDisplay.parentElement;
                 container.innerHTML = `
                     <p id="user-display-name" class="text-xs font-bold leading-none">${currentUser.name}</p>
@@ -930,7 +931,6 @@
                 `;
             }
             
-            // Registration Form Info
             const formUserInfo = document.getElementById("form-user-info");
             if (formUserInfo) {
                 formUserInfo.innerText = `${currentUser.name} · ${currentUser.id}`;
@@ -939,7 +939,6 @@
                 }
             }
             
-            // Avatar update
             const photoImg = document.getElementById("user-photo");
             const initialDiv = document.getElementById("user-initial");
             
@@ -954,11 +953,15 @@
             }
         }
 
-        // --- Core Functions ---
+        // --- Core Functions & Features Implementation ---
+
+        // Integration of Real-time Search Filter Input Action
+        function handleSearchFilter() {
+            renderList();
+        }
 
         async function saveData(newRecord) {
             const records = await loadData();
-            // Link record to current user
             newRecord.userId = currentUser.id;
             newRecord.userName = currentUser.name;
             newRecord.grade = currentUser.grade;
@@ -976,14 +979,17 @@
             const borrowTable = document.getElementById("borrow-table-body");
             const historyTable = document.getElementById("history-table-body");
             const cardsGrid = document.getElementById("return-cards-grid");
+            const searchKeyword = document.getElementById("searchKeyword").value.trim().toLowerCase();
 
-            // Clear containers
             borrowTable.innerHTML = "";
             historyTable.innerHTML = "";
             cardsGrid.innerHTML = "";
 
             const actives = records.filter(r => r.status === "active");
             const completed = records.filter(r => r.status === "returned");
+
+            // Setup Today String to calculate Overdue Logic
+            const todayStr = new Date().toISOString().split('T')[0];
 
             // Stats update
             document.getElementById("stat-total").innerText = records.length;
@@ -992,47 +998,68 @@
             document.getElementById("stat-user").innerText = records.filter(r => r.userId === currentUser.id).length;
             document.getElementById("active-badge").innerText = `ACTIVE: ${actives.length}`;
 
-            if (actives.length === 0) {
+            // Filter Active Records based on Search Keywords if inputted
+            const filteredActives = actives.filter(r => {
+                if (!searchKeyword) return true;
+                return (r.bookTitle && r.bookTitle.toLowerCase().includes(searchKeyword)) ||
+                       (r.userName && r.userName.toLowerCase().includes(searchKeyword)) ||
+                       (r.userId && r.userId.toLowerCase().includes(searchKeyword));
+            });
+
+            if (filteredActives.length === 0) {
                 borrowTable.innerHTML = `<tr><td colspan="5" class="py-20 text-center font-serif-italic italic opacity-40">${t.noBorrow}</td></tr>`;
-                cardsGrid.innerHTML = `<div class="col-span-full py-12 text-center opacity-40 font-serif-italic italic">${t.noItemsToReturn}</div>`;
             } else {
-                actives.forEach(r => {
-                    // Row for table
+                filteredActives.forEach(r => {
+                    // Check if current date exceeds the due date to handle overdue labeling
+                    const isOverdue = r.returnDate && r.returnDate < todayStr;
+                    const overdueBadge = isOverdue ? `<span class="ml-2 px-1.5 py-0.5 text-[9px] font-mono font-bold bg-red-600 text-white uppercase tracking-wider">${t.overdue}</span>` : "";
+
                     const tr = document.createElement("tr");
                     tr.className = "border-b border-[#141414] border-opacity-10 hover:bg-[#141414] hover:text-[#E4E3E0] transition-colors group";
                     tr.innerHTML = `
-                        <td class="py-4 font-medium">${r.bookTitle}</td>
+                        <td class="py-4 font-medium flex items-center">${r.bookTitle}${overdueBadge}</td>
                         <td class="py-4">${r.userName || "未知用戶"}</td>
                         <td class="py-4 font-mono text-xs opacity-60">${r.grade || ""}${r.classLetter || ""} · ${r.userId || "N/A"}</td>
                         <td class="py-4 font-mono text-xs">${r.borrowDate}</td>
-                        <td class="py-4 font-mono text-xs">${r.returnDate}</td>
+                        <td class="py-4 font-mono text-xs ${isOverdue ? 'text-red-500 font-bold' : ''}">${r.returnDate}</td>
                     `;
                     borrowTable.appendChild(tr);
+                });
+            }
 
-                    // Card for return (only show if it's the current user's book)
+            // Render Personal Cards Group (always mapping all active rentals owned by user)
+            if (actives.length === 0) {
+                cardsGrid.innerHTML = `<div class="col-span-full py-12 text-center opacity-40 font-serif-italic italic">${t.noItemsToReturn}</div>`;
+            } else {
+                actives.forEach(r => {
                     if (r.userId === currentUser.id) {
+                        const isOverdue = r.returnDate && r.returnDate < todayStr;
+                        const cardOverdueTag = isOverdue ? `<span class="px-2 py-0.5 text-[9px] font-mono font-bold bg-red-600 text-white tracking-widest uppercase">${t.overdue}</span>` : "";
+
                         const card = document.createElement("div");
-                        card.className = "border border-[#E4E3E0] border-opacity-20 p-6 flex flex-col justify-between hover:border-opacity-100 transition-all group";
+                        card.className = `border ${isOverdue ? 'border-red-600' : 'border-[#E4E3E0] border-opacity-20'} p-6 flex flex-col justify-between hover:border-opacity-100 transition-all group`;
                         card.innerHTML = `
                             <div>
                                 <div class="flex justify-between items-start mb-4 opacity-50 font-mono text-[10px]">
                                     <span>ID: ${r.id && r.id.includes('_') ? r.id.split('_')[1] : 'N/A'}</span>
-                                    <span>${r.userId} · ${r.userName}</span>
+                                    <div class="flex items-center gap-2">
+                                        ${cardOverdueTag}
+                                        <span>${r.userId} · ${r.userName}</span>
+                                    </div>
                                 </div>
                                 <h3 class="text-lg font-bold mb-1">${r.bookTitle}</h3>
                                 <div class="text-[11px] font-mono opacity-50 space-y-1 mb-4">
                                     <p>${t.fieldDate}: ${r.borrowDate}</p>
-                                    <p class="text-red-400">${t.fieldExpectedReturn}: ${r.returnDate}</p>
+                                    <p class="${isOverdue ? 'text-red-500 font-bold' : 'text-red-400'}">${t.fieldExpectedReturn}: ${r.returnDate}</p>
                                 </div>
                             </div>
-                            <button onclick="returnBook('${r.id}')" class="mt-6 w-full border border-[#E4E3E0] py-2 text-xs font-bold uppercase tracking-widest hover:bg-[#E4E3E0] hover:text-[#141414] transition-all">${t.returnBtn}</button>
+                            <button onclick="returnBook('${r.id}')" class="mt-6 w-full border ${isOverdue ? 'border-red-600 text-red-500 hover:bg-red-600 hover:text-white' : 'border-E4E3E0 hover:bg-[#E4E3E0] hover:text-[#141414]'} py-2 text-xs font-bold uppercase tracking-widest transition-all">${t.returnBtn}</button>
                         `;
                         cardsGrid.appendChild(card);
                     }
                 });
             }
 
-            // If no personal cards were added
             if (cardsGrid.innerHTML === "") {
                 cardsGrid.innerHTML = `<div class="col-span-full py-12 text-center opacity-40 font-serif-italic italic">${t.myBorrowOnly}</div>`;
             }
@@ -1153,14 +1180,12 @@
             }
         }
 
-        // Initialize and Refactored window.onload
         window.onload = async () => {
             document.getElementById("borrowDate").value = new Date().toISOString().split('T')[0];
             await renderList();
             if (typeof lucide !== 'undefined') lucide.createIcons();
         };
 
-        // Initial identity check
         checkAuth();
     </script>
 </body>
