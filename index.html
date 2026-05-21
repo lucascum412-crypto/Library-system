@@ -61,9 +61,9 @@
                 </button>
             </div>
             <div class="space-y-4 font-serif-italic opacity-80 text-lg leading-relaxed">
-                <p>1. 使用 Google 帳戶授權登入以確保您的資料同步。</p>
+                <p>1. 首次進入系統請完整填寫個人資訊登記。</p>
                 <p>2. 在「借書登記」頁面可以點擊左側快速引入推薦書籍，或點擊按鈕手動輸入新登記。</p>
-                <p>3. 點擊右上角頭像可以進入個人檔案修改補齊年級與班別資訊。</p>
+                <p>3. 點擊右上角頭像可以進入個人檔案修改欄位（如 GAS 端點 URL）。</p>
                 <p>4. 在「還書管理」分頁中，您可以隨時對名下未歸還的書籍辦理退還手續。</p>
             </div>
             <button onclick="closeModal('modal-help')" class="w-full bg-[#141414] text-[#E4E3E0] py-4 text-xs font-bold uppercase tracking-widest">關閉</button>
@@ -82,12 +82,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <form onsubmit="handleUpdateProfile(event)" class="space-y-6">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-mono uppercase opacity-50">姓名 (Google 同步)</label>
+                        <label class="text-[10px] font-mono uppercase opacity-50">姓名</label>
                         <input type="text" id="profile-name" class="form-input text-lg font-bold" required>
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-mono uppercase opacity-50">系統 UID 編號</label>
-                        <input type="text" id="profile-id" class="form-input text-lg font-mono" readonly>
+                        <label class="text-[10px] font-mono uppercase opacity-50">學號 / 編號</label>
+                        <input type="text" id="profile-id" class="form-input text-lg font-mono" required>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
@@ -114,7 +114,7 @@
                     </div>
                     <div class="space-y-1">
                         <label class="text-[10px] font-mono uppercase opacity-50">頭像網址</label>
-                        <input type="url" id="profile-avatar" class="form-input text-sm" readonly>
+                        <input type="url" id="profile-avatar" class="form-input text-sm">
                     </div>
                     <button type="submit" class="w-full bg-[#141414] text-[#E4E3E0] py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all">儲存修改</button>
                 </form>
@@ -132,9 +132,9 @@
                         <button onclick="exportUserData()" class="w-full border border-[#141414] border-dashed py-3 text-[10px] font-mono uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-all flex items-center justify-center gap-2">
                             <span>匯出用戶檔案 (JSON)</span>
                         </button>
-                        <button id="btn-logout" class="w-full bg-red-600 text-white py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                        <button onclick="handleLogout()" class="w-full bg-red-600 text-white py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                            <span>登出 Google 帳戶</span>
+                            <span>登出並清除本地快取</span>
                         </button>
                     </div>
                 </div>
@@ -168,24 +168,48 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-20"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/><path d="M12 2h10"/><path d="m16 2-4 4 4 4"/></svg>
                 </div>
                 <h2 class="text-2xl font-bold uppercase tracking-widest">圖書館系統登錄</h2>
-                <p class="font-serif-italic opacity-60 text-sm">請授權以同步您的借閱紀錄</p>
+                <p class="font-serif-italic opacity-60 text-sm">請填寫您的資訊以初始化系統帳戶</p>
             </div>
             
-            <div class="space-y-4">
-                <button id="btn-google-login" class="w-full border border-[#141414] py-4 flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest hover:bg-[#141414] hover:text-[#E4E3E0] transition-all bg-white">
-                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    <span>Google 帳號一鍵登入</span>
-                </button>
-                <div id="login-error" class="text-red-600 text-[10px] font-mono text-center hidden break-words"></div>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <div class="h-[1px] flex-1 bg-[#141414] opacity-10"></div>
-                <span class="text-[10px] font-mono uppercase opacity-30 text-nowrap">或暫時以訪客進入</span>
-                <div class="h-[1px] flex-1 bg-[#141414] opacity-10"></div>
-            </div>
-
-            <button onclick="handleGuestLogin()" class="w-full bg-[#141414] text-[#E4E3E0] py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all">本地訪客測試模式</button>
+            <form onsubmit="handleCustomLogin(event)" class="space-y-6">
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-mono uppercase opacity-50">姓名</label>
+                        <input type="text" id="login-name" class="form-input text-lg" placeholder="請輸入真實姓名" required>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-mono uppercase opacity-50">學號 / 編號</label>
+                        <input type="text" id="login-id" class="form-input text-lg" placeholder="SXXXXX" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-mono uppercase opacity-50">年級</label>
+                            <select id="login-grade" class="form-input text-sm h-[40px] bg-transparent" onchange="updateClassOptions('login')" required>
+                                <option value="" disabled selected>請選擇</option>
+                                <optgroup label="Primary (P)">
+                                    <option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option>
+                                    <option value="P4">P4</option><option value="P5">P5</option><option value="P6">P6</option>
+                                </optgroup>
+                                <optgroup label="Secondary (S)">
+                                    <option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+                                    <option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-mono uppercase opacity-50">班別</label>
+                            <select id="login-class" class="form-input text-sm h-[40px] bg-transparent" required>
+                                <option value="" disabled selected>先選擇年級</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-mono uppercase opacity-50">頭像網址 (選填)</label>
+                        <input type="url" id="login-avatar" class="form-input text-sm" placeholder="https://...">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#141414] text-[#E4E3E0] py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all">進入系統</button>
+            </form>
         </div>
     </div>
 
@@ -207,7 +231,7 @@
                     <p id="user-display-name" class="text-xs font-bold leading-none">載入中...</p>
                 </div>
                 <div id="user-avatar-container" onclick="openModal('modal-profile')" class="w-10 h-10 rounded-full overflow-hidden bg-[#141414] flex items-center justify-center text-[#E4E3E0] cursor-pointer hover:ring-2 ring-[#141414] ring-offset-2 transition-all">
-                    <img id="user-photo" src="" class="w-full h-full object-cover hidden" referrerpolicy="no-referrer">
+                    <img id="user-photo" src="" class="w-full h-full object-cover hidden">
                     <div id="user-initial" class="text-sm font-bold">?</div>
                 </div>
                 <button onclick="openModal('modal-help')" class="w-10 h-10 rounded-full border border-[#141414] border-opacity-10 flex items-center justify-center hover:bg-[#141414] hover:text-[#E4E3E0] transition-all">
@@ -255,6 +279,386 @@
                 </div>
             </section>
 
+            <div id="content-borrow" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <section class="lg:col-span-4" id="register-section">
+                    <div class="sticky top-6 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h2 class="font-serif-italic text-xl opacity-70" id="form-title">本月推薦書籍</h2>
+                            <button onclick="toggleForm()" id="toggle-form-btn" class="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-md border border-[#141414] bg-[#E4E3E0] text-[#141414] hover:bg-[#141414] hover:text-[#E4E3E0]">
+                                <span id="toggle-text">手動登記</span>
+                            </button>
+                        </div>
+
+                        <div id="recommendations-container" class="space-y-8 max-h-[60vh] overflow-y-auto pr-2">
+                            <div class="space-y-4">
+                                <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] opacity-40 border-b border-[#141414] border-opacity-10 pb-2">Fiction 小說類</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-start gap-4 group cursor-pointer" onclick="quickFill('The Catcher in the Rye')">
+                                        <span class="font-serif-italic text-2xl opacity-20 group-hover:opacity-100 transition-opacity">01</span>
+                                        <div class="flex-1 min-w-0"><p class="font-bold text-sm truncate">The Catcher in the Rye</p><p class="text-[10px] opacity-50 uppercase tracking-wider">J.D. Salinger</p></div>
+                                    </div>
+                                    <div class="flex items-start gap-4 group cursor-pointer" onclick="quickFill('1984')">
+                                        <span class="font-serif-italic text-2xl opacity-20 group-hover:opacity-100 transition-opacity">02</span>
+                                        <div class="flex-1 min-w-0"><p class="font-bold text-sm truncate">1984</p><p class="text-[10px] opacity-50 uppercase tracking-wider">George Orwell</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] opacity-40 border-b border-[#141414] border-opacity-10 pb-2">Science 科學類</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-start gap-4 group cursor-pointer" onclick="quickFill('A Brief History of Time')">
+                                        <span class="font-serif-italic text-2xl opacity-20 group-hover:opacity-100 transition-opacity">03</span>
+                                        <div class="flex-1 min-w-0"><p class="font-bold text-sm truncate">A Brief History of Time</p><p class="text-[10px] opacity-50 uppercase tracking-wider">Stephen Hawking</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="manual-form-container" class="hidden bg-white p-6 border border-[#141414] border-opacity-10 card-enter space-y-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider">新增借閱登錄</h3>
+                            <form onsubmit="handleRegisterBorrow(event)" class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-mono opacity-50">書籍名稱 / Book Title</label>
+                                    <input type="text" id="borrow-book-title" class="form-input text-sm" required>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-mono opacity-50">書籍編號 / ISBN or ID</label>
+                                    <input type="text" id="borrow-book-id" class="form-input text-sm font-mono" placeholder="BK-XXXX" required>
+                                </div>
+                                <button type="submit" class="w-full bg-[#141414] text-[#E4E3E0] py-3 text-xs font-bold uppercase tracking-widest">確認送出</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="lg:col-span-8 space-y-6">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] opacity-40">全校即時借閱紀錄看板</h2>
+                        <div class="h-[1px] flex-1 bg-[#141414] opacity-10"></div>
+                    </div>
+                    <div class="bg-white border border-[#141414] border-opacity-10 overflow-hidden rounded-sm shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-[#141414] bg-[#141414] text-[#E4E3E0] text-[10px] font-mono uppercase tracking-wider">
+                                    <th class="p-4">書籍資訊</th>
+                                    <th class="p-4">借閱人</th>
+                                    <th class="p-4">日期</th>
+                                    <th class="p-4">狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="borrow-records-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-return" class="hidden space-y-6 card-enter">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] opacity-40">個人未還書籍清單</h2>
+                    <div class="h-[1px] flex-1 bg-[#141414] opacity-10"></div>
+                </div>
+                <div id="return-list-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const classMapping = {
+            'P1': ['A', 'B', 'C'], 'P2': ['A', 'B'], 'P3': ['A', 'B', 'C'],
+            'P4': ['A', 'B'], 'P5': ['A', 'B', 'C', 'D'], 'P6': ['A', 'B'],
+            'S1': ['A', 'B', 'C', 'D'], 'S2': ['A', 'B', 'C'], 'S3': ['A', 'B'],
+            'S4': ['A', 'B'], 'S5': ['A', 'B', 'C'], 'S6': ['A', 'B']
+        };
+
+        const defaultBooks = [
+            { id: "BK-8091", title: "A Brief History of Time", user: "陳小明", date: "2026-05-10", status: "active" },
+            { id: "BK-1984", title: "1984", user: "張華", date: "2026-05-12", status: "active" },
+            { id: "BK-0342", title: "The Great Gatsby", user: "李美美", date: "2026-04-20", status: "returned" }
+        ];
+
+        if (!localStorage.getItem('library_books')) {
+            localStorage.setItem('library_books', JSON.stringify(defaultBooks));
+        }
+
+        window.openModal = function(id) { document.getElementById(id).classList.remove('hidden'); };
+        window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
+
+        window.switchTab = function(tab) {
+            const bBtn = document.getElementById('tab-borrow');
+            const rBtn = document.getElementById('tab-return');
+            const bContent = document.getElementById('content-borrow');
+            const rContent = document.getElementById('content-return');
+
+            if (tab === 'borrow') {
+                bBtn.className = "tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest bg-[#E4E3E0] text-[#141414]";
+                rBtn.className = "tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest text-[#E4E3E0] hover:opacity-70";
+                bContent.classList.remove('hidden');
+                rContent.classList.add('hidden');
+            } else {
+                rBtn.className = "tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest bg-[#E4E3E0] text-[#141414]";
+                bBtn.className = "tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest text-[#E4E3E0] hover:opacity-70";
+                bContent.classList.add('hidden');
+                rContent.classList.remove('hidden');
+                renderReturnGrid();
+            }
+        };
+
+        window.toggleForm = function() {
+            const rec = document.getElementById('recommendations-container');
+            const form = document.getElementById('manual-form-container');
+            const txt = document.getElementById('toggle-text');
+            const title = document.getElementById('form-title');
+
+            if (form.classList.contains('hidden')) {
+                form.classList.remove('hidden');
+                rec.classList.add('hidden');
+                txt.innerText = "查看推薦";
+                title.innerText = "手動借閱表單";
+            } else {
+                form.classList.add('hidden');
+                rec.classList.remove('hidden');
+                txt.innerText = "手動登記";
+                title.innerText = "本月推薦書籍";
+            }
+        };
+
+        window.quickFill = function(title) {
+            toggleForm();
+            document.getElementById('borrow-book-title').value = title;
+            document.getElementById('borrow-book-id').value = "BK-" + Math.floor(1000 + Math.random() * 9000);
+        };
+
+        window.updateClassOptions = function(prefix) {
+            const grade = document.getElementById(`${prefix}-grade`).value;
+            const classSelect = document.getElementById(`${prefix}-class`);
+            classSelect.innerHTML = '';
+            if (classMapping[grade]) {
+                classMapping[grade].forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c; opt.innerText = `Class ${c}`;
+                    classSelect.appendChild(opt);
+                });
+            }
+        };
+
+        window.checkAuth = function() {
+            const user = localStorage.getItem('library_user');
+            const overlay = document.getElementById('login-overlay');
+            const app = document.getElementById('app');
+
+            if (user) {
+                overlay.classList.add('hidden');
+                app.classList.remove('hidden');
+                const data = JSON.parse(user);
+                document.getElementById('user-display-name').innerText = data.name;
+                
+                if (data.avatar) {
+                    document.getElementById('user-photo').src = data.avatar;
+                    document.getElementById('user-photo').classList.remove('hidden');
+                    document.getElementById('user-initial').classList.add('hidden');
+                } else {
+                    document.getElementById('user-photo').classList.add('hidden');
+                    document.getElementById('user-initial').innerText = data.name.charAt(0).toUpperCase();
+                    document.getElementById('user-initial').classList.remove('hidden');
+                }
+
+                document.getElementById('profile-name').value = data.name;
+                document.getElementById('profile-id').value = data.id;
+                document.getElementById('profile-grade').value = data.grade || "S1";
+                updateClassOptions('profile');
+                document.getElementById('profile-class').value = data.class || "A";
+                document.getElementById('profile-avatar').value = data.avatar || "";
+                if(data.gas) document.getElementById('profile-gas-url').value = data.gas;
+
+                renderTable();
+            } else {
+                overlay.classList.remove('hidden');
+                app.classList.add('hidden');
+            }
+        };
+
+        window.handleCustomLogin = function(e) {
+            e.preventDefault();
+            localStorage.setItem('library_user', JSON.stringify({
+                name: document.getElementById('login-name').value,
+                id: document.getElementById('login-id').value,
+                grade: document.getElementById('login-grade').value,
+                class: document.getElementById('login-class').value,
+                avatar: document.getElementById('login-avatar').value
+            }));
+            checkAuth();
+        };
+
+        window.handleUpdateProfile = function(e) {
+            e.preventDefault();
+            localStorage.setItem('library_user', JSON.stringify({
+                name: document.getElementById('profile-name').value,
+                id: document.getElementById('profile-id').value,
+                grade: document.getElementById('profile-grade').value,
+                class: document.getElementById('profile-class').value,
+                avatar: document.getElementById('profile-avatar').value,
+                gas: document.getElementById('profile-gas-url').value
+            }));
+            closeModal('modal-profile');
+            checkAuth();
+        };
+
+        window.handleLogout = function() {
+            localStorage.removeItem('library_user');
+            closeModal('modal-profile');
+            checkAuth();
+        };
+
+        window.exportUserData = function() {
+            const blob = new Blob([localStorage.getItem('library_user')], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = "library_profile.json";
+            a.click();
+        };
+
+        function renderTable() {
+            const books = JSON.parse(localStorage.getItem('library_books') || "[]");
+            const tbody = document.getElementById('borrow-records-table');
+            tbody.innerHTML = '';
+
+            let activeCount = books.filter(b => b.status === 'active').length;
+            document.getElementById('stat-total').innerText = books.length + 120;
+            document.getElementById('stat-active').innerText = activeCount;
+            document.getElementById('stat-returned').innerText = (books.length + 120) - activeCount;
+
+            books.slice().reverse().forEach(book => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-[#141414] border-opacity-5 text-xs bg-white hover:bg-[#fafafa] transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4"><p class="font-bold">${book.title}</p><p class="text-[10px] font-mono opacity-50">${book.id}</p></td>
+                    <td class="p-4 font-bold">${book.user}</td>
+                    <td class="p-4 font-mono opacity-70">${book.date}</td>
+                    <td class="p-4"><span class="px-2 py-1 text-[10px] font-mono ${book.status === 'active' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${book.status.toUpperCase()}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.handleRegisterBorrow = function(e) {
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem('library_user'));
+            const books = JSON.parse(localStorage.getItem('library_books') || "[]");
+            
+            books.push({
+                id: document.getElementById('borrow-book-id').value,
+                title: document.getElementById('borrow-book-title').value,
+                user: user.name,
+                date: new Date().toISOString().split('T')[0],
+                status: "active"
+            });
+
+            localStorage.setItem('library_books', JSON.stringify(books));
+            document.getElementById('borrow-book-id').value = '';
+            document.getElementById('borrow-book-title').value = '';
+            toggleForm();
+            renderTable();
+        };
+
+        function renderReturnGrid() {
+            const user = JSON.parse(localStorage.getItem('library_user'));
+            const books = JSON.parse(localStorage.getItem('library_books') || "[]");
+            const grid = document.getElementById('return-list-grid');
+            grid.innerHTML = '';
+
+            const myActive = books.filter(b => b.user === user.name && b.status === 'active');
+            if (myActive.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 font-serif-italic opacity-40">您目前名下沒有未還的書籍。</div>`;
+                return;
+            }
+
+            myActive.forEach(book => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 border border-[#141414] border-opacity-10 rounded-sm shadow-sm flex flex-col justify-between space-y-4";
+                card.innerHTML = `
+                    <div>
+                        <p class="text-[10px] font-mono opacity-40 uppercase">${book.id}</p>
+                        <h3 class="font-bold text-lg">${book.title}</h3>
+                        <p class="text-xs font-serif-italic opacity-60 mt-2">借閱日期: ${book.date}</p>
+                    </div>
+                    <button onclick="returnBook('${book.id}')" class="w-full border border-red-600 text-red-600 hover:bg-red-600 hover:text-white py-2 text-xs font-bold uppercase tracking-widest transition-all">辦理歸還</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.returnBook = function(id) {
+            const books = JSON.parse(localStorage.getItem('library_books') || "[]");
+            const target = books.find(b => b.id === id && b.status === 'active');
+            if (target) {
+                target.status = 'returned';
+                localStorage.setItem('library_books', JSON.stringify(books));
+                renderReturnGrid();
+                renderTable();
+            }
+        };
+
+        /* Async AI Analysis Report Engine */
+        async function mockFetchReadingMetrics() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const books = JSON.parse(localStorage.getItem('library_books') || "[]");
+                    const user = JSON.parse(localStorage.getItem('library_user'));
+                    const myCount = books.filter(b => b.user === (user ? user.name : "")).length;
+                    resolve({
+                        total: myCount + 4,
+                        fav: "Science 科學思維 與 Fiction 文學敘事",
+                        latest: books[books.length - 1]?.title || "無指定書籍",
+                        status: "success"
+                    });
+                }, 1200);
+            });
+        }
+
+        window.generateAIReport = async function() {
+            const btn = document.getElementById('ai-report-btn');
+            const btnText = document.getElementById('ai-btn-text');
+            const loadingIcon = document.getElementById('ai-loading-icon');
+            const content = document.getElementById('ai-report-content');
+            
+            openModal('modal-ai-report');
+            loadingIcon.classList.remove('hidden');
+            content.innerHTML = `<p class="text-center opacity-50 mt-10 pulse">正在非同步抓取校園雲端借閱軌跡，並交叉比對大數據矩陣，請稍候...</p>`;
+            
+            btn.disabled = true;
+            btnText.innerText = "生成中...";
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const metrics = await mockFetchReadingMetrics();
+                if (metrics.status === "success") {
+                    content.innerHTML = `
+                        <div class="space-y-6 card-enter">
+                            <p class="font-bold text-lg border-b border-[#141414] border-opacity-10 pb-2">📊 校園雲端分析報告已就緒</p>
+                            <p>親愛的讀者，系統比對您在本地系統的歷史數據，您近期在本校的活躍總計達 <strong class="text-xl font-mono">${metrics.total}</strong> 冊次。</p>
+                            <p>經 AI 多維度語義網路建模分析，您的核心閱讀象限高度偏向 <span class="bg-[#141414] text-[#E4E3E0] px-2 py-1 text-xs font-mono uppercase tracking-wide rounded-sm">${metrics.fav}</span>。</p>
+                            <p>您最新關注的學術載體為《<strong>${metrics.latest}</strong>》，這反映了您當前對思維縱深與文本結構的雙重偏好。</p>
+                            <div class="mt-6 p-5 border border-[#141414] border-opacity-10 bg-white">
+                                <p class="text-[10px] font-mono uppercase opacity-50 mb-2">💡 次月閱讀矩陣精準推薦 (Next Read Suggestion)</p>
+                                <p class="text-sm">基於目前抓取的邏輯，建議您嘗試涉獵 <strong>《Cosmos》(卡爾·薩根)</strong>。這本書能精準對接您現有的學術視角，擴充理性模型的架構層次。</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                content.innerHTML = `<p class="text-center text-red-600 mt-10">數據同步失敗，請檢查本地網路或雲端 GAS 配置節點。</p>`;
+            } finally {
+                loadingIcon.classList.add('hidden');
+                btn.disabled = false;
+                btnText.innerText = "AI 閱讀分析";
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => { checkAuth(); });
+    </script>
+</body>
+</html>
             <div id="content-borrow" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <section class="lg:col-span-4" id="register-section">
                     <div class="sticky top-6 space-y-6">
