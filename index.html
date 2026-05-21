@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -33,13 +32,13 @@
         window.signOut = signOut;
 
         // Listen for auth state
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // If logged in via Google but not fully "registered" in our local sense
                 // we still allow checkAuth to handle the local storage part
-                checkAuth();
+                await checkAuth();
             } else {
-                checkAuth(); // This will show login if no local user either
+                await checkAuth(); // This will show login if no local user either
             }
         });
     </script>
@@ -105,7 +104,6 @@
     </style>
 </head>
 <body class="selection:bg-[#141414] selection:text-[#E4E3E0]">
-    <!-- Help Modal -->
     <div id="modal-help" class="modal-overlay hidden">
         <div class="w-full max-w-lg bg-[#E4E3E0] p-10 rounded-sm shadow-2xl space-y-6">
             <div class="flex items-center justify-between mb-4">
@@ -124,7 +122,6 @@
         </div>
     </div>
 
-    <!-- Profile/Settings Modal (Expanded to Profile Page) -->
     <div id="modal-profile" class="modal-overlay hidden">
         <div class="w-full max-w-xl bg-[#E4E3E0] p-8 rounded-sm shadow-2xl space-y-8 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-[#141414] border-opacity-10 pb-4">
@@ -135,7 +132,6 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <!-- User Data Section -->
                 <form onsubmit="handleUpdateProfile(event)" class="space-y-6">
                     <div class="space-y-1">
                         <label class="text-[10px] font-mono uppercase opacity-50" data-t="nameLabel">姓名</label>
@@ -164,8 +160,7 @@
                         <div class="space-y-1">
                             <label class="text-[10px] font-mono uppercase opacity-50" data-t="classLabel">班別</label>
                             <select id="profile-class" class="form-input text-sm h-[40px] bg-transparent" required>
-                                <!-- Options filled by JS -->
-                            </select>
+                                </select>
                         </div>
                     </div>
                     <div class="space-y-1">
@@ -179,7 +174,6 @@
                     <button type="submit" class="w-full bg-[#141414] text-[#E4E3E0] py-4 text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all" data-t="saveChanges">儲存修改</button>
                 </form>
 
-                <!-- Settings Section -->
                 <div class="space-y-8">
                     <div class="space-y-4">
                         <label class="text-[10px] font-mono uppercase opacity-50" data-t="selectLanguage">語言設定</label>
@@ -278,17 +272,23 @@
     </div>
 
     <div id="app" class="min-h-screen pb-20 hidden">
-        <!-- Header -->
         <header class="border-b border-[#141414] p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/><path d="M12 2h10"/><path d="m16 2-4 4 4 4"/></svg>
                 <h1 class="text-2xl font-bold tracking-tight uppercase">Library Rental System</h1>
             </div>
             
-            <nav class="flex bg-[#141414] p-1 rounded-sm">
-                <button onclick="switchTab('borrow')" id="tab-borrow" class="tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest bg-[#E4E3E0] text-[#141414]">借書登記</button>
-                <button onclick="switchTab('return')" id="tab-return" class="tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest text-[#E4E3E0] hover:opacity-70">還書管理</button>
-            </nav>
+            <div class="flex items-center gap-4">
+                <nav class="flex bg-[#141414] p-1 rounded-sm items-center gap-2">
+                    <button onclick="switchTab('borrow')" id="tab-borrow" class="tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest bg-[#E4E3E0] text-[#141414]">借書登記</button>
+                    <button onclick="switchTab('return')" id="tab-return" class="tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest text-[#E4E3E0] hover:opacity-70">還書管理</button>
+                </nav>
+                
+                <button onclick="handleAISummary()" id="aiBtn" class="flex items-center gap-1.5 bg-zinc-900 text-zinc-100 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-zinc-800 transition-colors active:scale-95 border border-zinc-700 disabled:opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/></svg>
+                    <span id="aiBtnText">AI 報告</span>
+                </button>
+            </div>
 
             <div class="flex items-center gap-4">
                 <div class="text-right hidden sm:block">
@@ -310,7 +310,6 @@
         </header>
 
         <main class="max-w-7xl mx-auto p-6">
-            <!-- Stats -->
             <section class="mb-12">
                 <div class="flex items-center gap-3 mb-6">
                     <h2 class="text-[10px] font-mono font-bold uppercase tracking-[0.2em] opacity-40" data-t="statsSummary">數據統計摘要</h2>
@@ -336,16 +335,14 @@
                         <p class="text-[10px] font-mono uppercase opacity-50 mb-1" data-t="activeStudents">活躍學生</p>
                         <p id="stat-students" class="text-3xl font-bold tracking-tighter transition-transform origin-left">1</p>
                     </div>
-                    <div class="p-4 border border-[#141414] border-opacity-10 bg-[#141414] text-[#E4E3E0] shadow-sm hover:shadow-md transition-shadow group col-span-2 md:col-span-1">
+                    <div class="p-4 border border-[#141414] border-opacity-10 bg-141414 text-[#E4E3E0] shadow-sm hover:shadow-md transition-shadow group col-span-2 md:col-span-1">
                         <p class="text-[10px] font-mono uppercase opacity-50 mb-1 text-[#E4E3E0]" data-t="yourActivity">您的活躍度</p>
                         <p id="stat-user" class="text-3xl font-bold tracking-tighter transition-transform origin-left">0</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Tabs Content -->
             <div id="content-borrow" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Sidebar Form -->
                 <section class="lg:col-span-4 transition-all" id="register-section">
                     <div class="sticky top-6">
                         <div class="flex items-center justify-between mb-6">
@@ -358,7 +355,6 @@
                         </div>
 
                         <div id="recommendations-list" class="space-y-8 max-h-[60vh] overflow-y-auto pr-2">
-                            <!-- Fiction -->
                             <div class="space-y-4">
                                 <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] opacity-40 border-b border-[#141414] border-opacity-10 pb-2">Fiction 小說類</h3>
                                 <div class="space-y-3">
@@ -400,7 +396,6 @@
                                 </div>
                             </div>
 
-                            <!-- Science -->
                             <div class="space-y-4">
                                 <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] opacity-40 border-b border-[#141414] border-opacity-10 pb-2">Science 科學類</h3>
                                 <div class="space-y-3">
@@ -442,7 +437,6 @@
                                 </div>
                             </div>
 
-                            <!-- History -->
                             <div class="space-y-4">
                                 <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] opacity-40 border-b border-[#141414] border-opacity-10 pb-2">History 歷史類</h3>
                                 <div class="space-y-3">
@@ -514,7 +508,6 @@
                     </div>
                 </section>
 
-                <!-- Borrow List -->
                 <section class="lg:col-span-8 lg:border-l lg:border-[#141414] lg:pl-8">
                     <div class="flex items-center justify-between mb-6 text-xl">
                         <h2 class="font-serif-italic opacity-70" data-t="currentBorrowList">當前借出清單</h2>
@@ -532,14 +525,12 @@
                                 </tr>
                             </thead>
                             <tbody id="borrow-table-body">
-                                <!-- Records here -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </section>
             </div>
 
-            <!-- Return Tab -->
             <div id="content-return" class="hidden space-y-8 card-enter">
                 <section class="bg-[#141414] text-[#E4E3E0] p-8 rounded-sm">
                     <div class="flex items-center justify-between mb-8">
@@ -549,8 +540,7 @@
                         </div>
                     </div>
                     <div id="return-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Cards here -->
-                    </div>
+                        </div>
                 </section>
                 
                 <section>
@@ -567,8 +557,7 @@
                                 </tr>
                             </thead>
                             <tbody id="history-table-body">
-                                <!-- History here -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </section>
@@ -588,6 +577,42 @@
                     body: JSON.stringify(payload)
                 });
             } catch (e) { console.warn(e); }
+        }
+
+        function normalizeRecord(record) {
+            return {
+                id: record.id || record.ID || "",
+                createdAt: record.createdAt || record.CreatedAt || "",
+                userId: record.userId || record.UserId || "",
+                userName: record.userName || record.UserName || "未知讀者",
+                status: record.status || record.Status || "active",
+                bookTitle: record.bookTitle || record.BookTitle || "未知名稱",
+                borrowDate: record.borrowDate || record.BorrowDate || "",
+                returnDate: record.returnDate || record.ReturnDate || "",
+                returnedAt: record.returnedAt || record.ReturnedAt || ""
+            };
+        }
+
+        async function fetchRecordsFromSheet() {
+            if (APPS_SCRIPT_URL.includes("PASTE")) return null;
+            try {
+                const res = await fetch(APPS_SCRIPT_URL);
+                const data = await res.json();
+                return Array.isArray(data.records) ? data.records.map(normalizeRecord) : null;
+            } catch (e) {
+                console.warn("從 Sheet 讀取失敗", e);
+                return null;
+            }
+        }
+
+        async function loadData() {
+            const remote = await fetchRecordsFromSheet();
+            if (remote) {
+                localStorage.setItem("records", JSON.stringify(remote));
+                return remote;
+            }
+            const data = localStorage.getItem("records");
+            return data ? JSON.parse(data) : [];
         }
 
         // --- Translations ---
@@ -710,14 +735,14 @@
 
         let currentLang = localStorage.getItem("lang") || 'zh-TW';
 
-        function changeLanguage(lang) {
+        async function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem("lang", lang);
-            updateUITranslations();
+            await updateUITranslations();
             closeModal('modal-profile');
         }
 
-        function updateUITranslations() {
+        async function updateUITranslations() {
             const t = TRANSLATIONS[currentLang];
             document.querySelectorAll('[data-t]').forEach(el => {
                 const key = el.getAttribute('data-t');
@@ -733,7 +758,7 @@
             document.getElementById("tab-return").innerText = t.returnTab;
             
             // Re-render lists to update dynamic content
-            renderList();
+            await renderList();
         }
 
         function openModal(id) {
@@ -757,7 +782,7 @@
         function exportUserData() {
             const data = {
                 user: currentUser,
-                records: loadData(),
+                records: localStorage.getItem("records") ? JSON.parse(localStorage.getItem("records")) : [],
                 exportedAt: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -772,7 +797,7 @@
         // --- Identity Logic ---
         let currentUser = null;
 
-        function checkAuth() {
+        async function checkAuth() {
             const savedUser = localStorage.getItem("user");
             if (savedUser) {
                 try {
@@ -780,20 +805,20 @@
                     document.getElementById("login-overlay").classList.add("hidden");
                     document.getElementById("app").classList.remove("hidden");
                     updateUserUI();
-                    updateUITranslations();
-                    renderList();
+                    await updateUITranslations();
+                    await renderList();
                 } catch (e) {
                     localStorage.removeItem("user");
-                    checkAuth();
+                    await checkAuth();
                 }
             } else {
                 document.getElementById("login-overlay").classList.remove("hidden");
                 document.getElementById("app").classList.add("hidden");
-                updateUITranslations();
+                await updateUITranslations();
             }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const name = document.getElementById("login-name").value;
             const id = document.getElementById("login-id").value;
@@ -803,7 +828,7 @@
             
             currentUser = { name, id, grade, classLetter, photo };
             localStorage.setItem("user", JSON.stringify(currentUser));
-            checkAuth();
+            await checkAuth();
         }
 
         async function handleGoogleLogin() {
@@ -852,7 +877,7 @@
             });
         }
 
-        function handleUpdateProfile(e) {
+        async function handleUpdateProfile(e) {
             e.preventDefault();
             const t = TRANSLATIONS[currentLang];
             const name = document.getElementById("profile-name").value;
@@ -868,8 +893,7 @@
             updateUserUI();
             alert(t.profileUpdateSuccess);
             closeModal('modal-profile');
-            // Force refresh lists to update user info in history if needed
-            renderList();
+            await renderList();
         }
 
         async function handleLogout() {
@@ -930,30 +954,25 @@
             }
         }
 
-        // --- Core Functions (Rule 6) ---
+        // --- Core Functions ---
 
-        function saveData(newRecord) {
-            const records = loadData();
+        async function saveData(newRecord) {
+            const records = await loadData();
             // Link record to current user
             newRecord.userId = currentUser.id;
             newRecord.userName = currentUser.name;
             newRecord.grade = currentUser.grade;
             newRecord.classLetter = currentUser.classLetter;
             
-            records.push(newRecord);
+            records.unshift(newRecord);
             localStorage.setItem("records", JSON.stringify(records));
             syncToSheet({ action: "create", record: newRecord });
-            renderList();
+            await renderList(records);
         }
 
-        function loadData() {
-            const records = localStorage.getItem("records");
-            return records ? JSON.parse(records) : [];
-        }
-
-        function renderList() {
+        async function renderList(recordsOverride) {
             const t = TRANSLATIONS[currentLang];
-            const records = loadData();
+            const records = recordsOverride || await loadData();
             const borrowTable = document.getElementById("borrow-table-body");
             const historyTable = document.getElementById("history-table-body");
             const cardsGrid = document.getElementById("return-cards-grid");
@@ -970,7 +989,7 @@
             document.getElementById("stat-total").innerText = records.length;
             document.getElementById("stat-active").innerText = actives.length;
             document.getElementById("stat-returned").innerText = completed.length;
-            document.getElementById("stat-user").innerText = records.length;
+            document.getElementById("stat-user").innerText = records.filter(r => r.userId === currentUser.id).length;
             document.getElementById("active-badge").innerText = `ACTIVE: ${actives.length}`;
 
             if (actives.length === 0) {
@@ -997,7 +1016,7 @@
                         card.innerHTML = `
                             <div>
                                 <div class="flex justify-between items-start mb-4 opacity-50 font-mono text-[10px]">
-                                    <span>ID: ${r.id.split('_')[1]}</span>
+                                    <span>ID: ${r.id && r.id.includes('_') ? r.id.split('_')[1] : 'N/A'}</span>
                                     <span>${r.userId} · ${r.userName}</span>
                                 </div>
                                 <h3 class="text-lg font-bold mb-1">${r.bookTitle}</h3>
@@ -1027,7 +1046,7 @@
                     tr.innerHTML = `
                         <td class="py-4 font-medium">${r.bookTitle}</td>
                         <td class="py-4 font-mono text-xs">${r.borrowDate} ~ ${r.returnDate}</td>
-                        <td class="py-4 font-mono text-xs">${new Date(r.returnedAt).toLocaleDateString()}</td>
+                        <td class="py-4 font-mono text-xs">${r.returnedAt ? new Date(r.returnedAt).toLocaleDateString() : ""}</td>
                     `;
                     historyTable.appendChild(tr);
                 });
@@ -1039,13 +1058,14 @@
         let activeTab = 'borrow';
         let isFormVisible = false;
 
-        function switchTab(tab) {
+        async function switchTab(tab) {
             activeTab = tab;
             document.getElementById("content-borrow").classList.toggle("hidden", tab !== 'borrow');
             document.getElementById("content-return").classList.toggle("hidden", tab !== 'return');
             
             document.getElementById("tab-borrow").className = `tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest ${tab === 'borrow' ? 'bg-[#E4E3E0] text-[#141414]' : 'text-[#E4E3E0] hover:opacity-70'}`;
             document.getElementById("tab-return").className = `tab-btn px-6 py-2 text-xs font-bold uppercase tracking-widest ${tab === 'return' ? 'bg-[#E4E3E0] text-[#141414]' : 'text-[#E4E3E0] hover:opacity-70'}`;
+            await renderList();
         }
 
         function toggleForm() {
@@ -1063,7 +1083,7 @@
             }
         }
 
-        function handleFormSubmit(e) {
+        async function handleFormSubmit(e) {
             const t = TRANSLATIONS[currentLang];
             e.preventDefault();
             const record = {
@@ -1074,16 +1094,16 @@
                 borrowDate: document.getElementById("borrowDate").value,
                 returnDate: document.getElementById("returnDate").value
             };
-            saveData(record);
+            await saveData(record);
             e.target.reset();
             toggleForm();
             alert(t.borrowSuccess);
         }
 
-        function returnBook(id) {
+        async function returnBook(id) {
             const t = TRANSLATIONS[currentLang];
             if (!confirm(t.confirmReturn)) return;
-            const records = loadData();
+            const records = await loadData();
             const index = records.findIndex(r => r.id === id);
             if (index !== -1) {
                 const returnedAt = new Date().toISOString();
@@ -1095,14 +1115,52 @@
                     id: id, 
                     changes: { status: "returned", returnedAt: returnedAt } 
                 });
-                renderList();
+                await renderList(records);
             }
         }
 
-        // Initialize dates
-        document.getElementById("borrowDate").value = new Date().toISOString().split('T')[0];
+        // --- AI Helper Functions ---
 
-        // Initial render
+        async function askAI(userPrompt) {
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "askAI", prompt: userPrompt })
+            });
+            const data = await res.json();
+            return data.result || data.error || "AI 沒有回應";
+        }
+
+        async function handleAISummary() {
+            const btn = document.getElementById('aiBtn');
+            const text = document.getElementById('aiBtnText');
+            btn.disabled = true;
+            text.textContent = '計算中...';
+            try {
+                const records = await loadData();
+                if (records.length === 0) { alert('未有借閱紀錄資料可以產生報告'); return; }
+                const summaryInput = records.slice(0, 30).map(r =>
+                    `[${r.status === 'active' ? '借閱中' : '已歸還'}] 讀者: ${r.userName}, 書名: ${r.bookTitle}`
+                ).join('\n');
+                const prompt = '以下是圖書館系統最新的借閱紀錄資料。請用繁體中文，用 3-5 句概括目前最受歡迎的書籍種類或讀者群、目前書籍過期未還或借閱中的狀況，以及有無明顯的借閱行為規律或趨勢:\n\n' + summaryInput;
+                const result = await askAI(prompt);
+                alert(result);
+            } catch (e) {
+                alert('AI 出錯：' + e.message);
+            } finally {
+                btn.disabled = false;
+                text.textContent = 'AI 報告';
+            }
+        }
+
+        // Initialize and Refactored window.onload
+        window.onload = async () => {
+            document.getElementById("borrowDate").value = new Date().toISOString().split('T')[0];
+            await renderList();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        // Initial identity check
         checkAuth();
     </script>
 </body>
